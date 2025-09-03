@@ -38,7 +38,14 @@ const PSAChecker = () => {
 
   // Make API call to PSA
   const fetchPSAData = async () => {
-    if (!apiKey || !certNumber) return;
+    if (!apiKey || !certNumber) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both API key and certificate number",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setLoading(true);
     setError(null);
@@ -79,17 +86,6 @@ const PSAChecker = () => {
     }
   };
 
-  // Auto-fetch when both fields are filled
-  useEffect(() => {
-    if (apiKey && certNumber) {
-      const timeoutId = setTimeout(() => {
-        fetchPSAData();
-      }, 500); // Debounce for 500ms
-      
-      return () => clearTimeout(timeoutId);
-    }
-  }, [apiKey, certNumber]);
-
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -100,7 +96,7 @@ const PSAChecker = () => {
             <h1 className="text-3xl font-bold text-foreground">PSA API Checker</h1>
           </div>
           <p className="text-muted-foreground">
-            Automatically check PSA certificates when you enter API key and cert number
+            Enter your API key and certificate number, then click Check API
           </p>
         </div>
 
@@ -149,6 +145,23 @@ const PSAChecker = () => {
                 className="font-mono"
               />
             </div>
+            <Button 
+              onClick={fetchPSAData}
+              disabled={loading || !apiKey || !certNumber}
+              className="w-full"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Checking API...
+                </>
+              ) : (
+                <>
+                  <Shield className="h-4 w-4 mr-2" />
+                  Check API
+                </>
+              )}
+            </Button>
           </CardContent>
         </Card>
 
