@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +9,29 @@ import { useToast } from "@/hooks/use-toast";
 
 const PSAChecker = () => {
   const [apiKey, setApiKey] = useState("");
-  const [certNumber, setCertNumber] = useState("79909125");
+  const [certNumber, setCertNumber] = useState("");
   const { toast } = useToast();
+
+  // Load saved values from localStorage on mount
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem("psa-api-key");
+    const savedCertNumber = localStorage.getItem("psa-cert-number");
+    
+    if (savedApiKey) setApiKey(savedApiKey);
+    if (savedCertNumber) setCertNumber(savedCertNumber);
+  }, []);
+
+  // Save API key to localStorage when it changes
+  const handleApiKeyChange = (value: string) => {
+    setApiKey(value);
+    localStorage.setItem("psa-api-key", value);
+  };
+
+  // Save cert number to localStorage when it changes
+  const handleCertNumberChange = (value: string) => {
+    setCertNumber(value);
+    localStorage.setItem("psa-cert-number", value);
+  };
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -44,7 +65,7 @@ const PSAChecker = () => {
                 id="apikey"
                 placeholder="Paste your PSA API bearer token here..."
                 value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
+                onChange={(e) => handleApiKeyChange(e.target.value)}
                 className="min-h-[100px] font-mono text-sm"
               />
             </div>
@@ -64,9 +85,10 @@ const PSAChecker = () => {
               <Label htmlFor="certnumber">Certificate Number</Label>
               <Input
                 id="certnumber"
+                type="text"
                 placeholder="Enter certificate number..."
                 value={certNumber}
-                onChange={(e) => setCertNumber(e.target.value)}
+                onChange={(e) => handleCertNumberChange(e.target.value)}
                 className="font-mono"
               />
             </div>
