@@ -171,6 +171,75 @@ const PSAChecker = () => {
           </CardContent>
         </Card>
 
+        {/* Request Preview */}
+        {apiKey && certNumber && (
+          <Card className="border-primary">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                🔍 Request Preview
+              </CardTitle>
+              <CardDescription>
+                Exact request that will be sent to PSA API
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Method</Label>
+                  <div className="p-2 bg-muted rounded-md">
+                    <Badge variant="secondary">GET</Badge>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Content-Type</Label>
+                  <div className="p-2 bg-muted rounded-md">
+                    <span className="text-sm">application/json</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">URL</Label>
+                <div className="p-2 bg-muted rounded-md break-all">
+                  <span className="text-sm font-mono">
+                    https://api.psacard.com/publicapi/cert/GetByCertNumber/{certNumber}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Headers</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  <pre className="text-sm font-mono">
+{`{
+  "authorization": "bearer ${apiKey.substring(0, 20)}...${apiKey.substring(apiKey.length - 10)}",
+  "Accept": "application/json",
+  "Content-Type": "application/json"
+}`}
+                  </pre>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Full Fetch Request</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  <pre className="text-sm font-mono overflow-x-auto">
+{`fetch("https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}", {
+  method: "GET",
+  headers: {
+    "authorization": "bearer ${apiKey.substring(0, 20)}...${apiKey.substring(apiKey.length - 10)}",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+  },
+  mode: "cors"
+})`}
+                  </pre>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Results */}
         {error && (
           <Card className="border-error">
