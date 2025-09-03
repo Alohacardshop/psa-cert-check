@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Shield, CheckCircle, XCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 
 interface PSAResult {
@@ -283,30 +284,122 @@ const PSAChecker = () => {
           </Card>
         )}
 
-        {/* API Structure Display */}
+        {/* API Testing Options */}
         <Card>
           <CardHeader>
-            <CardTitle>API Call Structure</CardTitle>
+            <CardTitle>Test API with Multiple Methods</CardTitle>
             <CardDescription>
-              Current configuration based on your input
+              Choose how you want to test the PSA API - browser, terminal, or server-side
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="bg-muted p-4 rounded-md text-sm font-mono overflow-x-auto">
-{`var settings = {
+            <Tabs defaultValue="fetch" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="fetch">JavaScript</TabsTrigger>
+                <TabsTrigger value="jquery">jQuery</TabsTrigger>
+                <TabsTrigger value="curl">Terminal cURL</TabsTrigger>
+                <TabsTrigger value="php">PHP cURL</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="fetch" className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">JavaScript Fetch (Browser)</Label>
+                  <div className="p-4 bg-muted rounded-md">
+                    <pre className="text-sm font-mono overflow-x-auto">
+{`// Modern JavaScript Fetch API
+const response = await fetch("https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}", {
+  method: "GET",
+  headers: {
+    "authorization": "bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+  },
+  mode: "cors"
+});
+
+const data = await response.json();
+console.log(data);`}
+                    </pre>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="jquery" className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">jQuery AJAX (Browser)</Label>
+                  <div className="p-4 bg-muted rounded-md">
+                    <pre className="text-sm font-mono overflow-x-auto">
+{`// jQuery AJAX (from your image)
+var settings = {
   "async": true,
   "crossDomain": true,
   "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}",
   "method": "GET",
   "headers": {
-    "authorization": "bearer ${apiKey ? '[API_KEY_SET]' : '[API_KEY_REQUIRED]'}"
+    "authorization": "bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}"
   }
 };
 
 $.ajax(settings).done(function (response) {
   console.log(response);
 });`}
-            </pre>
+                    </pre>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="curl" className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Terminal cURL Command</Label>
+                  <div className="p-4 bg-muted rounded-md">
+                    <pre className="text-sm font-mono overflow-x-auto">
+{`# Copy and paste this in your terminal
+curl -X GET \\
+  "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}" \\
+  -H "Authorization: bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}" \\
+  -H "Accept: application/json" \\
+  -H "Content-Type: application/json"`}
+                    </pre>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    💡 Replace the token with your full API key when running in terminal
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="php" className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">PHP cURL (Server-side)</Label>
+                  <div className="p-4 bg-muted rounded-md">
+                    <pre className="text-sm font-mono overflow-x-auto">
+{`<?php
+// PHP cURL implementation (like your example)
+$curl = curl_init();
+
+curl_setopt($curl, CURLOPT_URL, "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}");
+$authorization = "Authorization: bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}";
+
+curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+    'Content-Type: application/json',
+    $authorization
+));
+
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_HTTPGET, true);
+
+$result = curl_exec($curl);
+$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+curl_close($curl);
+
+echo "HTTP Code: " . $httpCode . "\\n";
+echo "Response: " . $result;
+?>`}
+                    </pre>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
