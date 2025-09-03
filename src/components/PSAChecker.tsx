@@ -307,10 +307,10 @@ const PSAChecker = () => {
                   <div className="p-4 bg-muted rounded-md">
                     <pre className="text-sm font-mono overflow-x-auto">
 {`// Modern JavaScript Fetch API
-const response = await fetch("https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}", {
+const response = await fetch("https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}", {
   method: "GET",
   headers: {
-    "authorization": "bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}",
+    "authorization": "bearer ${apiKey}",
     "Accept": "application/json",
     "Content-Type": "application/json"
   },
@@ -321,6 +321,22 @@ const data = await response.json();
 console.log(data);`}
                     </pre>
                   </div>
+                  {apiKey && certNumber && (
+                    <Button 
+                      onClick={checkCertificate}
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Testing with JavaScript...
+                        </>
+                      ) : (
+                        "🚀 Test with JavaScript Fetch"
+                      )}
+                    </Button>
+                  )}
                 </div>
               </TabsContent>
 
@@ -333,10 +349,10 @@ console.log(data);`}
 var settings = {
   "async": true,
   "crossDomain": true,
-  "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}",
+  "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
   "method": "GET",
   "headers": {
-    "authorization": "bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}"
+    "authorization": "bearer ${apiKey}"
   }
 };
 
@@ -345,6 +361,41 @@ $.ajax(settings).done(function (response) {
 });`}
                     </pre>
                   </div>
+                  {apiKey && certNumber && (
+                    <div className="space-y-2">
+                      <Button 
+                        onClick={() => {
+                          const script = `
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
+  "method": "GET",
+  "headers": {
+    "authorization": "bearer ${apiKey}"
+  }
+};
+
+$.ajax(settings).done(function (response) {
+  console.log('jQuery Response:', response);
+}).fail(function(xhr, status, error) {
+  console.error('jQuery Error:', error);
+});`;
+                          navigator.clipboard.writeText(script);
+                          toast({
+                            title: "Copied!",
+                            description: "jQuery code copied to clipboard. Paste in browser console.",
+                          });
+                        }}
+                        className="w-full"
+                      >
+                        📋 Copy jQuery Code to Clipboard
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        💡 Paste the copied code in your browser console (F12) to test
+                      </p>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
@@ -355,15 +406,27 @@ $.ajax(settings).done(function (response) {
                     <pre className="text-sm font-mono overflow-x-auto">
 {`# Copy and paste this in your terminal
 curl -X GET \\
-  "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}" \\
-  -H "Authorization: bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}" \\
+  "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}" \\
+  -H "Authorization: bearer ${apiKey}" \\
   -H "Accept: application/json" \\
   -H "Content-Type: application/json"`}
                     </pre>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    💡 Replace the token with your full API key when running in terminal
-                  </div>
+                  {apiKey && certNumber && (
+                    <Button 
+                      onClick={() => {
+                        const curlCommand = `curl -X GET "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}" -H "Authorization: bearer ${apiKey}" -H "Accept: application/json" -H "Content-Type: application/json"`;
+                        navigator.clipboard.writeText(curlCommand);
+                        toast({
+                          title: "Copied!",
+                          description: "cURL command copied to clipboard. Run in your terminal.",
+                        });
+                      }}
+                      className="w-full"
+                    >
+                      📋 Copy cURL Command
+                    </Button>
+                  )}
                 </div>
               </TabsContent>
 
@@ -376,8 +439,8 @@ curl -X GET \\
 // PHP cURL implementation (like your example)
 $curl = curl_init();
 
-curl_setopt($curl, CURLOPT_URL, "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber || 'CERT_NUMBER'}");
-$authorization = "Authorization: bearer ${apiKey ? apiKey.substring(0, 20) + '...' : 'YOUR_API_KEY'}";
+curl_setopt($curl, CURLOPT_URL, "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}");
+$authorization = "Authorization: bearer ${apiKey}";
 
 curl_setopt($curl, CURLOPT_HTTPHEADER, array(
     'Content-Type: application/json',
@@ -397,6 +460,33 @@ echo "Response: " . $result;
 ?>`}
                     </pre>
                   </div>
+                  {apiKey && certNumber && (
+                    <Button 
+                      onClick={() => {
+                        const phpCode = `<?php
+$curl = curl_init();
+curl_setopt($curl, CURLOPT_URL, "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}");
+$authorization = "Authorization: bearer ${apiKey}";
+curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_HTTPGET, true);
+$result = curl_exec($curl);
+$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+curl_close($curl);
+echo "HTTP Code: " . $httpCode . "\\n";
+echo "Response: " . $result;
+?>`;
+                        navigator.clipboard.writeText(phpCode);
+                        toast({
+                          title: "Copied!",
+                          description: "PHP code copied to clipboard. Save as .php file and run.",
+                        });
+                      }}
+                      className="w-full"
+                    >
+                      📋 Copy PHP Code
+                    </Button>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
