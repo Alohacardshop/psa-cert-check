@@ -345,19 +345,17 @@ console.log(data);`}
                   <Label className="text-sm font-medium">jQuery AJAX (Browser)</Label>
                   <div className="p-4 bg-muted rounded-md">
                     <pre className="text-sm font-mono overflow-x-auto">
-{`// jQuery AJAX (from your image)
-var settings = {
-  "async": true,
-  "crossDomain": true,
-  "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
-  "method": "GET",
-  "headers": {
-    "authorization": "bearer ${apiKey}"
-  }
-};
-
+{`var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
+    "method": "GET",
+    "headers": {
+          "authorization": "bearer ${apiKey}"
+    }
+}
 $.ajax(settings).done(function (response) {
-  console.log(response);
+    console.log(response);
 });`}
                     </pre>
                   </div>
@@ -365,21 +363,17 @@ $.ajax(settings).done(function (response) {
                     <div className="space-y-2">
                       <Button 
                         onClick={() => {
-                          const script = `
-var settings = {
-  "async": true,
-  "crossDomain": true,
-  "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
-  "method": "GET",
-  "headers": {
-    "authorization": "bearer ${apiKey}"
-  }
-};
-
+                          const script = `var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
+    "method": "GET",
+    "headers": {
+          "authorization": "bearer ${apiKey}"
+    }
+}
 $.ajax(settings).done(function (response) {
-  console.log('jQuery Response:', response);
-}).fail(function(xhr, status, error) {
-  console.error('jQuery Error:', error);
+    console.log(response);
 });`;
                           navigator.clipboard.writeText(script);
                           toast({
