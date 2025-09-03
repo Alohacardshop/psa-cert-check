@@ -4,12 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Shield } from "lucide-react";
+import { Shield, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PSAChecker = () => {
   const [apiKey, setApiKey] = useState("");
   const [certNumber, setCertNumber] = useState("");
+  const [response, setResponse] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Load saved values from localStorage on mount
@@ -33,6 +36,60 @@ const PSAChecker = () => {
     localStorage.setItem("psa-cert-number", value);
   };
 
+  // Make API call to PSA
+  const fetchPSAData = async () => {
+    if (!apiKey || !certNumber) return;
+    
+    setLoading(true);
+    setError(null);
+    setResponse(null);
+
+    try {
+      const response = await fetch(
+        `https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}`,
+        {
+          method: 'GET',
+          headers: {
+            'authorization': `bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setResponse(data);
+      toast({
+        title: "Success!",
+        description: "PSA data retrieved successfully",
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch PSA data';
+      setError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Auto-fetch when both fields are filled
+  useEffect(() => {
+    if (apiKey && certNumber) {
+      const timeoutId = setTimeout(() => {
+        fetchPSAData();
+      }, 500); // Debounce for 500ms
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [apiKey, certNumber]);
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -40,10 +97,10 @@ const PSAChecker = () => {
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Shield className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">PSA jQuery Code Generator</h1>
+            <h1 className="text-3xl font-bold text-foreground">PSA API Checker</h1>
           </div>
           <p className="text-muted-foreground">
-            Generate jQuery AJAX code for PSA API testing
+            Automatically check PSA certificates when you enter API key and cert number
           </p>
         </div>
 
@@ -77,7 +134,7 @@ const PSAChecker = () => {
           <CardHeader>
             <CardTitle>Certificate Number</CardTitle>
             <CardDescription>
-              Enter a PSA certificate number for the jQuery code
+              Enter a PSA certificate number to check
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -95,56 +152,39 @@ const PSAChecker = () => {
           </CardContent>
         </Card>
 
-        {/* jQuery Code */}
-        {apiKey && certNumber && (
+        {/* API Response */}
+        {(loading || response || error) && (
           <Card>
             <CardHeader>
-              <CardTitle>jQuery AJAX Code</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                {loading && <Loader2 className="h-5 w-5 animate-spin" />}
+                PSA Certificate Data
+              </CardTitle>
               <CardDescription>
-                Copy this jQuery code to test the PSA API
+                {loading ? "Fetching certificate data..." : "API response from PSA"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-muted rounded-md">
-                <pre className="text-sm font-mono overflow-x-auto">
-{`var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
-    "method": "GET",
-    "headers": {
-          "authorization": "bearer ${apiKey}"
-    }
-}
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});`}
-                </pre>
-              </div>
-              <Button 
-                onClick={() => {
-                  const script = `var settings = {
-    "async": true,
-    "crossDomain": true,
-    "url": "https://api.psacard.com/publicapi/cert/GetByCertNumber/${certNumber}",
-    "method": "GET",
-    "headers": {
-          "authorization": "bearer ${apiKey}"
-    }
-}
-$.ajax(settings).done(function (response) {
-    console.log(response);
-});`;
-                  navigator.clipboard.writeText(script);
-                  toast({
-                    title: "Copied!",
-                    description: "jQuery code copied to clipboard",
-                  });
-                }}
-                className="w-full"
-              >
-                📋 Copy jQuery Code to Clipboard
-              </Button>
+            <CardContent>
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              )}
+              
+              {error && (
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <p className="text-destructive font-medium">Error:</p>
+                  <p className="text-destructive/80 text-sm mt-1">{error}</p>
+                </div>
+              )}
+              
+              {response && (
+                <div className="p-4 bg-muted rounded-md">
+                  <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+                    {JSON.stringify(response, null, 2)}
+                  </pre>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
